@@ -1,16 +1,30 @@
 [
   {
     "id": 1,
-    "image": "1.png",
+    "image": "1.jpg",
     "japanese": "お世話になります。",
     "english": "Thank you for having me.",
     "audio": "1.wav"
   },
   {
     "id": 2,
-    "image": "2.png",
+    "image": "2.jpg",
     "japanese": "朝食と夕食は何時ですか。",
     "english": "What time are breakfast and dinner?",
     "audio": "2.wav"
+  },
+  {
+    "id": 3,
+    "image": "3.jpg",
+    "japanese": "家の中を案内していただけますか。",
+    "english": "Could you show me around the house?",
+    "audio": "3.wav"
+  },
+  {
+    "id": 4,
+    "image": "4.jpg",
+    "japanese": "今シャワーを使ってもいいですか。",
+    "english": "May I use the shower now?",
+    "audio": "4.wav"
   }
 ]
