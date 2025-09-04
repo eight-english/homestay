@@ -1,16 +1,16 @@
 [
   {
     "id": 1,
-    "image": "images/1.png",
+    "image": "1.png",
     "japanese": "お世話になります。",
     "english": "Thank you for having me.",
-    "audio": "audio/1.wav"
+    "audio": "1.wav"
   },
   {
     "id": 2,
-    "image": "images/2.png",
+    "image": "2.png",
     "japanese": "朝食と夕食は何時ですか。",
     "english": "What time are breakfast and dinner?",
-    "audio": "audio/2.wav"
+    "audio": "2.wav"
   }
 ]
