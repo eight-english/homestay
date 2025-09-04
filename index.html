@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Swipe Learning App</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <style>
+    body { font-family: sans-serif; text-align: center; margin: 0; padding: 0; }
+    h2 { margin: 20px 0; }
+    .card { padding: 20px; border-radius: 15px; background: #f9f9f9;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 300px; margin: auto; }
+    .hidden-answer { display: none; margin-top: 10px; }
+    .show { display: block; }
+    button { margin: 10px; padding: 10px 20px; cursor: pointer; }
+    #mode-buttons { margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Swipe to Learn</h2>
+
+  <div id="mode-buttons">
+    <button onclick="setMode('unlearned')">📘 未学習だけ</button>
+    <button onclick="setMode('learned')">✅ 覚えたもの</button>
+  </div>
+
+  <div class="swiper">
+    <div class="swiper-wrapper" id="card-container"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    let data = [];
+    let learned = JSON.parse(localStorage.getItem("learned") || "[]");
+    let currentMode = "unlearned"; // デフォルトは未学習
+
+    // JSON読み込み
+    fetch("data.json")
+      .then(response => response.json())
+      .then(json => {
+        data = json;
+        renderCards();
+      });
+
+    function renderCards() {
+      const container = document.getElementById("card-container");
+      container.innerHTML = "";
+
+      let cards;
+      if (currentMode === "unlearned") {
+        cards = data.filter(item => !learned.includes(item.id));
+      } else {
+        cards = data.filter(item => learned.includes(item.id));
+      }
+
+      if (cards.length === 0) {
+        container.innerHTML = `<div class="swiper-slide"><p>カードはありません</p></div>`;
+      }
+
+      cards.forEach(item => {
+        const slide = document.createElement("div");
+        slide.className = "swiper-slide";
+        slide.innerHTML = `
+          <div class="card">
+            <img src="${item.image}" width="200"><br>
+            <p>${item.japanese}</p>
+            <button onclick="toggleAnswer(${item.id})">答えを見る</button>
+            <div id="answer-${item.id}" class="hidden-answer">
+              <p>${item.english}</p>
+              <audio controls src="${item.audio}"></audio>
+            </div>
+          </div>
+        `;
+        container.appendChild(slide);
+      });
+
+      if (window.swiper) swiper.destroy(true, true);
+      window.swiper = new Swiper(".swiper", {
+        on: {
+          slideNextTransitionStart: () => handleSwipe("right"),
+          slidePrevTransitionStart: () => handleSwipe("left")
+        }
+      });
+    }
+
+    // 答えの表示切替
+    window.toggleAnswer = (id) => {
+      document.getElementById(`answer-${id}`).classList.toggle("show");
+    };
+
+    // スワイプ処理（右＝覚えた登録）
+    function handleSwipe(direction) {
+      const index = swiper.previousIndex;
+      const cards = data.filter(item => !learned.includes(item.id));
+      const currentCard = cards[index];
+      if (!currentCard) return;
+
+      if (direction === "right") {
+        if (!learned.includes(currentCard.id)) {
+          learned.push(currentCard.id);
+          localStorage.setItem("learned", JSON.stringify(learned));
+        }
+      }
+    }
+
+    // モード切り替え
+    window.setMode = (mode) => {
+      currentMode = mode;
+      renderCards();
+    };
+  </script>
+</body>
+</html>
