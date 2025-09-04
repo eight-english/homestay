@@ -8,7 +8,7 @@
     body { font-family: sans-serif; text-align: center; margin: 0; padding: 0; }
     h2 { margin: 20px 0; }
     .card { padding: 20px; border-radius: 15px; background: #f9f9f9;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 300px; margin: auto; }
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 320px; margin: auto; }
     .hidden-answer { display: none; margin-top: 10px; }
     .show { display: block; }
     button { margin: 10px; padding: 10px 20px; cursor: pointer; }
@@ -31,9 +31,8 @@
   <script>
     let data = [];
     let learned = JSON.parse(localStorage.getItem("learned") || "[]");
-    let currentMode = "unlearned"; // デフォルトは未学習
+    let currentMode = "unlearned";
 
-    // JSON読み込み
     fetch("data.json")
       .then(response => response.json())
       .then(json => {
@@ -63,10 +62,11 @@
           <div class="card">
             <img src="${item.image}" width="200"><br>
             <p>${item.japanese}</p>
+            <audio id="audio-${item.id}" src="${item.audio}"></audio><br>
             <button onclick="toggleAnswer(${item.id})">答えを見る</button>
+            <button onclick="markLearned(${item.id})">覚えた</button>
             <div id="answer-${item.id}" class="hidden-answer">
               <p>${item.english}</p>
-              <audio controls src="${item.audio}"></audio>
             </div>
           </div>
         `;
@@ -82,12 +82,25 @@
       });
     }
 
-    // 答えの表示切替
+    // 答えを表示＋音声再生
     window.toggleAnswer = (id) => {
-      document.getElementById(`answer-${id}`).classList.toggle("show");
+      const answerDiv = document.getElementById(`answer-${id}`);
+      answerDiv.classList.toggle("show");
+      if (answerDiv.classList.contains("show")) {
+        document.getElementById(`audio-${id}`).play();
+      }
     };
 
-    // スワイプ処理（右＝覚えた登録）
+    // 覚えた登録
+    window.markLearned = (id) => {
+      if (!learned.includes(id)) {
+        learned.push(id);
+        localStorage.setItem("learned", JSON.stringify(learned));
+        renderCards();
+      }
+    };
+
+    // スワイプで覚えた登録
     function handleSwipe(direction) {
       const index = swiper.previousIndex;
       const cards = data.filter(item => !learned.includes(item.id));
@@ -95,14 +108,11 @@
       if (!currentCard) return;
 
       if (direction === "right") {
-        if (!learned.includes(currentCard.id)) {
-          learned.push(currentCard.id);
-          localStorage.setItem("learned", JSON.stringify(learned));
-        }
+        markLearned(currentCard.id);
       }
     }
 
-    // モード切り替え
+    // モード切替
     window.setMode = (mode) => {
       currentMode = mode;
       renderCards();
