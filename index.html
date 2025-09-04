@@ -101,8 +101,9 @@
       if (!learned.includes(id)) {
         learned.push(id);
         localStorage.setItem("learned", JSON.stringify(learned));
-        renderCards();
       }
+      renderCards();
+      moveNextOrLoop();
     };
 
     // ❌ 覚えてない（learnedから削除）
@@ -110,7 +111,19 @@
       learned = learned.filter(x => x !== id);
       localStorage.setItem("learned", JSON.stringify(learned));
       renderCards();
+      moveNextOrLoop();
     };
+
+    // 次へ or 最初に戻る
+    function moveNextOrLoop() {
+      if (window.swiper) {
+        if (swiper.isEnd) {
+          swiper.slideTo(0); // 最初のカードへ
+        } else {
+          swiper.slideNext(); // 次のカードへ
+        }
+      }
+    }
 
     // スワイプ処理
     function handleSwipe(direction) {
