@@ -3,25 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <title>Homestay Challenge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- スマホ用 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
   <style>
-    body { font-family: sans-serif; text-align: center; margin: 0; padding: 0; }
-    h2 { margin: 20px 0; }
-    .card { padding: 20px; border-radius: 15px; background: #f9f9f9;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 340px; margin: auto; }
+    body { font-family: sans-serif; text-align: center; margin: 0; padding: 0; background: #fafafa; }
+    h2 { margin: 20px 0; font-size: 1.4em; }
+    .card {
+      padding: 15px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 90%;          /* スマホファースト */
+      max-width: 400px;    /* タブレット以上でも大きくなりすぎない */
+      margin: auto;
+    }
+    .card img {
+      width: 100%;   /* 横幅いっぱい */
+      height: auto;  /* 縦横比を保持 */
+      border-radius: 8px;
+    }
     .hidden-answer { display: none; margin-top: 10px; }
     .show { display: block; }
-    button { padding: 10px 15px; cursor: pointer; }
-    #mode-buttons { margin-bottom: 20px; }
+    button {
+      padding: 10px 12px;
+      font-size: 0.9em;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #mode-buttons { margin: 15px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    #mode-buttons button { background: #eee; }
     .btn-row { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+    .btn-row button:nth-child(1) { background: #2196f3; color: white; } /* 答え */
+    .btn-row button:nth-child(2) { background: #4caf50; color: white; } /* ✅ */
+    .btn-row button:nth-child(3) { background: #f44336; color: white; } /* ❌ */
+    audio { width: 100%; margin-top: 8px; }
   </style>
 </head>
 <body>
   <h2>Homestay Challenge</h2>
 
   <div id="mode-buttons">
-    <button onclick="setMode('unlearned')">📘 未学習だけを確認</button>
-    <button onclick="setMode('learned')">✅ 覚えたのを見直す</button>
+    <button onclick="setMode('unlearned')">📘 未学習</button>
+    <button onclick="setMode('learned')">✅ 覚えた</button>
   </div>
 
   <div class="swiper">
@@ -34,7 +58,6 @@
     let learned = JSON.parse(localStorage.getItem("learned") || "[]");
     let currentMode = "unlearned";
 
-    // JSONを読み込み
     fetch("data.json")
       .then(response => response.json())
       .then(json => {
@@ -62,11 +85,11 @@
         slide.className = "swiper-slide";
         slide.innerHTML = `
           <div class="card">
-            <img src="${item.image}" width="200"><br>
+            <img src="${item.image}"><br>
             <p>${item.japanese}</p>
             <audio id="audio-${item.id}" src="${item.audio}" controls></audio><br>
             <div class="btn-row">
-              <button onclick="toggleAnswer(${item.id})">答えを見る</button>
+              <button onclick="toggleAnswer(${item.id})">答え</button>
               <button onclick="markLearned(${item.id})">✅</button>
               <button onclick="markUnlearned(${item.id})">❌</button>
             </div>
@@ -106,7 +129,7 @@
       moveNextOrLoop();
     };
 
-    // ❌ 覚えてない（learnedから削除）
+    // ❌ 覚えてない
     window.markUnlearned = (id) => {
       learned = learned.filter(x => x !== id);
       localStorage.setItem("learned", JSON.stringify(learned));
@@ -118,9 +141,9 @@
     function moveNextOrLoop() {
       if (window.swiper) {
         if (swiper.isEnd) {
-          swiper.slideTo(0); // 最初のカードへ
+          swiper.slideTo(0);
         } else {
-          swiper.slideNext(); // 次のカードへ
+          swiper.slideNext();
         }
       }
     }
